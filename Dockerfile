@@ -17,8 +17,11 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /home/node/app
 
+# Ensure node user owns the working directory
+RUN chown -R node:node /home/node/app
+
 # Copy package.json to install dependencies
-COPY package.json ./
+COPY --chown=node:node package.json ./
 
 # Install common packages using npm
 RUN npm install \
@@ -29,6 +32,9 @@ RUN npm install \
     helmet@7.1.0 \
     compression@1.7.4 \
     bcrypt@5.1.1
+
+# Switch to non-root user for security
+USER node
 
 # Command to keep the container running or for your app
 CMD ["node", "--version"]
