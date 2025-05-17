@@ -1,24 +1,26 @@
-# Use a lightweight Node.js base image with Node 23
-FROM node:23-slim
+# Use a lightweight Node.js Alpine base image with Node 23
+FROM node:23-alpine
 
 # Install system dependencies for canvas, sharp, and bcrypt
-RUN apt-get update && apt-get install -y \
-    build-essential \
+RUN apk add --no-cache \
+    build-base \
     python3 \
-    pkg-config \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev \
-    libvips-dev \
-    && rm -rf /var/lib/apt/lists/*
+    pkgconf \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev \
+    vips-dev
 
 # Set working directory
 WORKDIR /home/node/app
 
+# Ensure node user owns the working directory
+RUN chown -R node:node /home/node/app
+
 # Copy package.json to install dependencies
-COPY package.json ./
+COPY --chown=node:node package.json ./
 
 # Install common packages using npm
 RUN npm install \
@@ -29,6 +31,9 @@ RUN npm install \
     helmet@7.1.0 \
     compression@1.7.4 \
     bcrypt@5.1.1
+
+# Switch to non-root user for security
+USER node
 
 # Command to keep the container running or for your app
 CMD ["node", "--version"]
