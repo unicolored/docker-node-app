@@ -33,7 +33,7 @@ RUN npm install \
     bcrypt@5.1.1
 
 # Switch to non-root user for security
-USER node
+#USER node
 
 # Command to keep the container running or for your app
 CMD ["node", "--version"]
